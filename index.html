@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trío de Sabores</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', sans-serif;
+      background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.6);
+      height: 100%;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3em;
+      margin: 0;
+      color: #FFD700;
+    }
+
+    .subtitulo {
+      font-size: 1.2em;
+      color: #eee;
+    }
+
+    .tarjeta {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 20px 30px;
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      width: 90%;
+      max-width: 400px;
+      margin-bottom: 30px;
+    }
+
+    label, input, select, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    input, select {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #FFD700;
+      color: black;
+      padding: 10px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e6c200;
+    }
+
+    #mensaje {
+      margin-top: 10px;
+      color: #00ffb3;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .lista-pedidos li {
+      margin-bottom: 10px;
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 10px;
+      border-radius: 5px;
+      list-style: none;
+    }
+
+    .lista-pedidos {
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <header>
+      <h1>Trío de Sabores</h1>
+      <p class="subtitulo">Haz tu pedido</p>
+    </header>
+
+    <form id="formPedido" class="tarjeta">
+      <label for="mesa">Número de mesa:</label>
+      <input type="number" id="mesa" required>
+
+      <label for="pedido">Selecciona tu pedido:</label>
+      <select id="pedido" required>
+        <option value="">-- Elige una opción --</option>
+        <option value="Hamburguesa Gourmet">Hamburguesa Gourmet</option>
+        <option value="Pizza Artesanal">Pizza Artesanal</option>
+        <option value="Tacos Premium">Tacos Premium</option>
+        <option value="Ensalada Orgánica">Ensalada Orgánica</option>
+      </select>
+
+      <button type="submit">Enviar Pedido</button>
+      <p id="mensaje"></p>
+    </form>
+
+    <ul id="listaPedidos" class="tarjeta lista-pedidos"></ul>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("formPedido");
+      const lista = document.getElementById("listaPedidos");
+      const mensaje = document.getElementById("mensaje");
+
+      const mostrarPedidos = () => {
+        const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+        lista.innerHTML = "";
+
+        if (pedidos.length === 0) {
+          lista.innerHTML = "<li>No hay pedidos aún.</li>";
+        } else {
+          pedidos.forEach(p => {
+            const li = document.createElement("li");
+            li.textContent = `Mesa ${p.mesa}: ${p.pedido}`;
+            lista.appendChild(li);
+          });
+        }
+      };
+
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const mesa = document.getElementById("mesa").value.trim();
+        const pedido = document.getElementById("pedido").value.trim();
+
+        if (!mesa || !pedido) {
+          alert("Completa todos los campos.");
+          return;
+        }
+
+        const nuevoPedido = { mesa, pedido };
+
+        let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+        pedidos.push(nuevoPedido);
+        localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+        mensaje.textContent = "✅ Pedido enviado con éxito.";
+        mostrarPedidos();
+        form.reset();
+      });
+
+      mostrarPedidos();
+    });
+  </script>
+</body>
+</html>
